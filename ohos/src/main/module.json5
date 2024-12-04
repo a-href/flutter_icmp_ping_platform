@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "flutter_icmp_ping",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ],
+  }
+}

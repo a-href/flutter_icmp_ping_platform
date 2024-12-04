@@ -31,6 +31,9 @@ flutter:
       android:
         package: com.zuvola.flutter_icmp_ping
         pluginClass: FlutterIcmpPingPlugin
+      ohos:
+        package: com.zuvola.flutter_icmp_ping
+        pluginClass: FlutterIcmpPingPlugin
       ios:
         pluginClass: FlutterIcmpPingPlugin
 

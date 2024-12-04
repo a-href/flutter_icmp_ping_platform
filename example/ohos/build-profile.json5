@@ -1,0 +1,54 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "/Users/capgemini/.ohos/config/default_ohos_8CZK5gyGEqOnCVxtN59Ny8p3G66OicFB8gRalbdTFFM=.cer",
+          "storePassword": "0000001BB6CAF968C5EAC4485871B01AF5CF0AE96D15DF1675D1BF78496AA67B10FEC8B8545BCB5B880541",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001BF19433FFB29373B7FC1FBB68B5CCFDEBD8CF2BE49BF3808E1AE78D39363F2C45C9F06621686081",
+          "profile": "/Users/capgemini/.ohos/config/default_ohos_8CZK5gyGEqOnCVxtN59Ny8p3G66OicFB8gRalbdTFFM=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/capgemini/.ohos/config/default_ohos_8CZK5gyGEqOnCVxtN59Ny8p3G66OicFB8gRalbdTFFM=.p12"
+        }
+      },
+      {
+        "name": "dkdkdk",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "/Users/capgemini/.ohos/config/dkdkdk_ohos_8CZK5gyGEqOnCVxtN59Ny8p3G66OicFB8gRalbdTFFM=.cer",
+          "storePassword": "0000001A2FD117CED40A5D41BCF5277FD256EAA40956888A214D8883BE09292F97097BD851210F00E84C",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001A6F69D4B72E14C598589C661C76A5FD838314FCB25272F09318DE5F8B1DC7D91E5A7FDCDEDBF4",
+          "profile": "/Users/capgemini/.ohos/config/dkdkdk_ohos_8CZK5gyGEqOnCVxtN59Ny8p3G66OicFB8gRalbdTFFM=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/capgemini/.ohos/config/dkdkdk_ohos_8CZK5gyGEqOnCVxtN59Ny8p3G66OicFB8gRalbdTFFM=.p12"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "dkdkdk",
+        "compatibleSdkVersion": "5.0.0(12)",
+        "runtimeOS": "HarmonyOS"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}

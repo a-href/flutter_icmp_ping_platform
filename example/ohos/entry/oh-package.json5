@@ -1,0 +1,11 @@
+{
+  "name": "entry",
+  "version": "5.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "flutter_icmp_ping": "file:../har/flutter_icmp_ping.har"
+  }
+}

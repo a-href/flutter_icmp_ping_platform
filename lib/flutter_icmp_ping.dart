@@ -10,6 +10,7 @@ import 'package:flutter_icmp_ping/src/base_ping_stream.dart';
 import 'package:flutter_icmp_ping/src/models/ping_data.dart';
 import 'package:flutter_icmp_ping/src/ping_android.dart';
 import 'package:flutter_icmp_ping/src/ping_ios.dart';
+import 'package:flutter_icmp_ping/src/ping_ohos.dart';
 
 export 'package:flutter_icmp_ping/src/models/ping_data.dart';
 export 'package:flutter_icmp_ping/src/models/ping_error.dart';
@@ -24,6 +25,9 @@ class Ping {
     }
     if (defaultTargetPlatform == TargetPlatform.android) {
       _ping = PingAndroid(host, count, interval, timeout, ipv6, ttl);
+    }
+    if (defaultTargetPlatform == TargetPlatform.ohos) {
+      _ping = PingOhos(host, count, interval, timeout, ipv6, ttl);
     }
   }
 

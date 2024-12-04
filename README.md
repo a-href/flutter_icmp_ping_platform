@@ -8,6 +8,7 @@ Flutter plugin that sends ICMP ECHO_REQUEST.
 
 - Flutter Android
 - Flutter iOS
+- Flutter OHOS
 
 ## Getting Started
 

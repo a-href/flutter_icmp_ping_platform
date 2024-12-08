@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icmp_ping/flutter_icmp_ping.dart';
+import 'package:flutter_icmp_ping_platform/flutter_icmp_ping_platform.dart';
 
 void main() {
   runApp(const MyApp());

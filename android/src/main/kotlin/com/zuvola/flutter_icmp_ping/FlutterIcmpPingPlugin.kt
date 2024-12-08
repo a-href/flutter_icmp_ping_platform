@@ -1,4 +1,4 @@
-package com.zuvola.flutter_icmp_ping
+package com.zuvola.flutter_icmp_ping_platform
 
 import androidx.annotation.NonNull
 
@@ -17,7 +17,7 @@ class FlutterIcmpPingPlugin: FlutterPlugin, MethodCallHandler {
   private lateinit var channel : MethodChannel
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_icmp_ping")
+    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_icmp_ping_platform")
     channel.setMethodCallHandler(this)
   }
 

@@ -6,6 +6,7 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "flutter_icmp_ping": "file:../har/flutter_icmp_ping.har"
+    "flutter_icmp_ping": "file:../har/flutter_icmp_ping.har",
+    "flutter_icmp_ping_platform": "file:../har/flutter_icmp_ping_platform.har"
   }
 }

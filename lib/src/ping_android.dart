@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:async/async.dart';
-import 'package:flutter_icmp_ping/src/base_ping_stream.dart';
-import 'package:flutter_icmp_ping/src/models/ping_data.dart';
-import 'package:flutter_icmp_ping/src/models/ping_error.dart';
-import 'package:flutter_icmp_ping/src/models/ping_response.dart';
-import 'package:flutter_icmp_ping/src/models/ping_summary.dart';
+import 'package:flutter_icmp_ping_platform/src/base_ping_stream.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_data.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_error.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_response.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_summary.dart';
 
 class PingAndroid extends BasePing {
   PingAndroid(String host, int? count, double? interval, double? timeout,
@@ -105,6 +105,28 @@ class PingAndroid extends BasePing {
         );
       }
       if (data.contains('packet loss')) {
+        final transmitted = _summaryRegexes[0].firstMatch(data);
+        final received = _summaryRegexes[1].firstMatch(data);
+        final time = _summaryRegexes[2].firstMatch(data);
+        if (transmitted == null || received == null || time == null) {
+          return;
+        }
+        final group1 = transmitted.group(1);
+        final group2 = received.group(1);
+        final group3 = time.group(1);
+        sink.add(
+          PingData(
+            summary: PingSummary(
+              transmitted: group1 == null ? null : int.parse(group1),
+              received: group2 == null ? null : int.parse(group2),
+              time: group3 == null
+                  ? null
+                  : Duration(milliseconds: int.parse(group3)),
+            ),
+          ),
+        );
+      }
+      if (data.contains('Network is unreachable')) {
         final transmitted = _summaryRegexes[0].firstMatch(data);
         final received = _summaryRegexes[1].firstMatch(data);
         final time = _summaryRegexes[2].firstMatch(data);

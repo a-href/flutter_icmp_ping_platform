@@ -1,6 +1,6 @@
 {
   "module": {
-    "name": "flutter_icmp_ping",
+    "name": "flutter_icmp_ping_platform",
     "type": "har",
     "deviceTypes": [
       "default",

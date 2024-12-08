@@ -1,4 +1,4 @@
-group 'com.zuvola.flutter_icmp_ping'
+group 'com.zuvola.flutter_icmp_ping_platform'
 version '1.0-SNAPSHOT'
 
 buildscript {

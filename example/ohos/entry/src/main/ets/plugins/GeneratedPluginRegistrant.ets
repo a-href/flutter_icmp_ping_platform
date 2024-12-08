@@ -1,5 +1,5 @@
 import { FlutterEngine, Log } from '@ohos/flutter_ohos';
-import FlutterIcmpPingPlugin from 'flutter_icmp_ping';
+import FlutterIcmpPingPlugin from 'flutter_icmp_ping_platform';
 
 /**
  * Generated file. Do not edit.

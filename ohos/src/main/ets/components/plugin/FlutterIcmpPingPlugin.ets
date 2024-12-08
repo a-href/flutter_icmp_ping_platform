@@ -19,7 +19,7 @@ export default class FlutterIcmpPingPlugin implements FlutterPlugin, MethodCallH
   }
 
   onAttachedToEngine(binding: FlutterPluginBinding): void {
-    this.channel = new MethodChannel(binding.getBinaryMessenger(), "flutter_icmp_ping");
+    this.channel = new MethodChannel(binding.getBinaryMessenger(), "flutter_icmp_ping_platform");
     this.channel.setMethodCallHandler(this)
   }
 

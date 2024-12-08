@@ -1,21 +1,21 @@
 // Copyright 2021 zuvola. All rights reserved.
 
 /// Flutter plugin that sends ICMP ECHO_REQUEST.
-library flutter_icmp_ping;
+library flutter_icmp_ping_platform;
 
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_icmp_ping/src/base_ping_stream.dart';
-import 'package:flutter_icmp_ping/src/models/ping_data.dart';
-import 'package:flutter_icmp_ping/src/ping_android.dart';
-import 'package:flutter_icmp_ping/src/ping_ios.dart';
-import 'package:flutter_icmp_ping/src/ping_ohos.dart';
+import 'package:flutter_icmp_ping_platform/src/base_ping_stream.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_data.dart';
+import 'package:flutter_icmp_ping_platform/src/ping_android.dart';
+import 'package:flutter_icmp_ping_platform/src/ping_ios.dart';
+import 'package:flutter_icmp_ping_platform/src/ping_ohos.dart';
 
-export 'package:flutter_icmp_ping/src/models/ping_data.dart';
-export 'package:flutter_icmp_ping/src/models/ping_error.dart';
-export 'package:flutter_icmp_ping/src/models/ping_response.dart';
-export 'package:flutter_icmp_ping/src/models/ping_summary.dart';
+export 'package:flutter_icmp_ping_platform/src/models/ping_data.dart';
+export 'package:flutter_icmp_ping_platform/src/models/ping_error.dart';
+export 'package:flutter_icmp_ping_platform/src/models/ping_response.dart';
+export 'package:flutter_icmp_ping_platform/src/models/ping_summary.dart';
 
 class Ping {
   Ping(String host,

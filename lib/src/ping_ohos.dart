@@ -3,112 +3,169 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:async/async.dart';
-import 'package:flutter_icmp_ping/src/base_ping_stream.dart';
-import 'package:flutter_icmp_ping/src/models/ping_data.dart';
-import 'package:flutter_icmp_ping/src/models/ping_error.dart';
-import 'package:flutter_icmp_ping/src/models/ping_response.dart';
-import 'package:flutter_icmp_ping/src/models/ping_summary.dart';
+import 'package:flutter_icmp_ping_platform/src/base_ping_stream.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_data.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_error.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_response.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_summary.dart';
 
 class PingOhos extends BasePing {
-  PingOhos(String host, int? count, double? interval, double? timeout, bool? ipv6, int? ttl) : super(host, count, interval, timeout, ipv6, ttl);
+  PingOhos(String host, int? count, double? interval, double? timeout,
+      bool? ipv6, int? ttl)
+      : super(host, count, interval, timeout, ipv6, ttl);
 
-  int _received = 0;
-  int _sent = 0;
-  List<Duration> _times = [];
+  static final _resRegex =
+  RegExp(r'from (.*): icmp_seq=(\d+) ttl=(\d+) time=((\d+).?(\d+))');
+  static final _seqRegex = RegExp(r'icmp_seq=(\d+)');
+  static final _summaryRegexes = [
+    RegExp(r'(\d+) packets transmitted'),
+    RegExp(r'(\d+) received'),
+    RegExp(r'time (\d+)ms'),
+  ];
+
+  Process? _process;
 
   @override
-  void onListen() {
-    _startPinging();
-  }
-
-  void _startPinging() async {
-    final args = <String>[
-      if (count != null) '-c $count',
-      if (timeout != null) '-W ${timeout!.toInt()}',
-      if (interval != null) '-i ${interval!.toStringAsFixed(1)}',
-      if (ttl != null) '-t $ttl',
-      if (ipv6 == true) '-6',
-      host,
-    ];
-
-    try {
-      final process = await Process.start('ping', args);
-
-      subscription = StreamGroup.merge([process.stdout, process.stderr]).transform(utf8.decoder).transform(const LineSplitter()).transform<PingData>(_createOhosTransformer()).listen((pingData) {
-        controller.add(pingData);
-        _sent++;
-        if (pingData.response != null) {
-          _received++;
-          if (pingData.response!.time != null) {
-            _times.add(pingData.response!.time!);
-          }
-        }
-      }, onError: (error) {
-        controller.addError(error);
-      }, onDone: () {
-        _generateSummary();
-        stop();
-      });
-    } catch (e) {
-      controller.addError('Failed to start ping process: $e');
-      stop();
+  Future<void> onListen() async {
+    if (_process != null) {
+      throw Exception('ping is already running');
     }
-  }
-
-  StreamTransformer<String, PingData> _createOhosTransformer() {
-    return StreamTransformer.fromHandlers(
-      handleData: (data, sink) {
-        final pingData = _parsePingOutput(data);
-        if (pingData != null) {
-          sink.add(pingData);
-        }
-      },
-    );
-  }
-
-  PingData? _parsePingOutput(String line) {
-    if (line.contains('time=')) {
-      final timeMatch = RegExp(r'time=([\d.]+)').firstMatch(line);
-      final seqMatch = RegExp(r'icmp_seq=(\d+)').firstMatch(line);
-      final ttlMatch = RegExp(r'ttl=(\d+)').firstMatch(line);
-
-      return PingData(
-        response: PingResponse(
-          ip: host,
-          seq: seqMatch != null ? int.tryParse(seqMatch.group(1) ?? '') : null,
-          ttl: ttlMatch != null ? int.tryParse(ttlMatch.group(1) ?? '') : null,
-          time: timeMatch != null ? Duration(milliseconds: (double.tryParse(timeMatch.group(1) ?? '0') ?? 0).round()) : null,
-        ),
-      );
-    } else if (line.contains('Destination Host Unreachable') || line.contains('Request timed out')) {
-      return PingData(
-        error: PingError.requestTimedOut,
-      );
+    var params = [];
+    if (count != null){
+      params.add('-c');
+      params.add('$count');
     }
-    return PingData(
-      error: PingError.unknownHost,
-    );
-  }
 
-  void _generateSummary() {
-    final summary = PingSummary(
-      transmitted: _sent,
-      received: _received,
-      time: _times.isNotEmpty ? _times.reduce((a, b) => a + b) : Duration.zero,
-    );
+    if (timeout != null){
+      params.add('-w');
+      params.add('${timeout?.toInt()}');
+    }
 
-    controller.add(
-      PingData(
-        summary: summary,
-      ),
-    );
+    if (interval != null){
+      params.add('-i');
+      params.add('$interval');
+    }
+
+    if (ttl != null){
+      params.add('-t');
+      params.add('$ttl');
+    }
+
+    List<String> command = [(ipv6 ?? false) ? 'ping6' : 'ping',...params,host];
+    _process = await Process.start(command.first, command.skip(1).toList());
+
+    if (_process == null) {
+      throw Exception('failed to start ping.');
+    }
+    _process?.exitCode.then((value) {
+      controller.close();
+    });
+    subscription = StreamGroup.merge([_process!.stderr, _process!.stdout])
+        .transform(utf8.decoder)
+        .transform(const LineSplitter())
+        .transform<PingData>(_androidTransformer)
+        .listen(controller.add);
   }
 
   @override
   void stop() {
-    super.stop();
-    _received = 0;
-    _sent = 0;
-    _times.clear();
+    _process?.kill(ProcessSignal.sigint);
+    _process = null;
   }
+
+  /// StreamTransformer for Android response from process stdout/stderr.
+  static final StreamTransformer<String, PingData> _androidTransformer =
+  StreamTransformer.fromHandlers(
+    handleData: (data, sink) {
+      print("lingjie data : $data");
+      if (data.contains('unknown host')) {
+        sink.add(
+          PingData(
+            error: PingError.unknownHost,
+          ),
+        );
+      }
+      if (data.contains('bytes from')) {
+        final match = _resRegex.firstMatch(data);
+        if (match == null) {
+          return;
+        }
+        final seq = match.group(2);
+        final ttl = match.group(3);
+        final time = match.group(4);
+        sink.add(
+          PingData(
+            response: PingResponse(
+              ip: match.group(1),
+              seq: seq == null ? null : int.parse(seq) - 1,
+              ttl: ttl == null ? null : int.parse(ttl),
+              time: time == null
+                  ? null
+                  : Duration(
+                  microseconds: ((double.parse(time)) * 1000).floor()),
+            ),
+          ),
+        );
+      }
+      if (data.contains('no answer yet')) {
+        final match = _seqRegex.firstMatch(data);
+        if (match == null) {
+          return;
+        }
+        final seq = match.group(1);
+        sink.add(
+          PingData(
+            response: PingResponse(
+              seq: seq == null ? null : int.parse(seq) - 1,
+            ),
+            error: PingError.requestTimedOut,
+          ),
+        );
+      }
+      if (data.contains('packet loss')) {
+        final transmitted = _summaryRegexes[0].firstMatch(data);
+        final received = _summaryRegexes[1].firstMatch(data);
+        final time = _summaryRegexes[2].firstMatch(data);
+        if (transmitted == null || received == null || time == null) {
+          return;
+        }
+        final group1 = transmitted.group(1);
+        final group2 = received.group(1);
+        final group3 = time.group(1);
+        sink.add(
+          PingData(
+            summary: PingSummary(
+              transmitted: group1 == null ? null : int.parse(group1),
+              received: group2 == null ? null : int.parse(group2),
+              time: group3 == null
+                  ? null
+                  : Duration(milliseconds: int.parse(group3)),
+            ),
+          ),
+        );
+      }
+      if (data.contains('Network is unreachable')) {
+        final transmitted = _summaryRegexes[0].firstMatch(data);
+        final received = _summaryRegexes[1].firstMatch(data);
+        final time = _summaryRegexes[2].firstMatch(data);
+        if (transmitted == null || received == null || time == null) {
+          return;
+        }
+        final group1 = transmitted.group(1);
+        final group2 = received.group(1);
+        final group3 = time.group(1);
+        sink.add(
+          PingData(
+            summary: PingSummary(
+              transmitted: group1 == null ? null : int.parse(group1),
+              received: group2 == null ? null : int.parse(group2),
+              time: group3 == null
+                  ? null
+                  : Duration(milliseconds: int.parse(group3)),
+            ),
+          ),
+        );
+      }
+    },
+  );
 }

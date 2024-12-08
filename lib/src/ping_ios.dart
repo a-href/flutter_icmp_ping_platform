@@ -1,18 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_icmp_ping/src/base_ping_stream.dart';
-import 'package:flutter_icmp_ping/src/models/ping_data.dart';
-import 'package:flutter_icmp_ping/src/models/ping_error.dart';
-import 'package:flutter_icmp_ping/src/models/ping_response.dart';
-import 'package:flutter_icmp_ping/src/models/ping_summary.dart';
+import 'package:flutter_icmp_ping_platform/src/base_ping_stream.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_data.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_error.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_response.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_summary.dart';
 
 class PingiOS extends BasePing {
   PingiOS(String host, int? count, double? interval, double? timeout,
       bool? ipv6, int? ttl)
       : super(host, count, interval, timeout, ipv6, ttl);
 
-  static const _channelName = 'flutter_icmp_ping';
+  static const _channelName = 'flutter_icmp_ping_platform';
   static const _methodCh = MethodChannel('$_channelName/method');
   static const _eventCh = EventChannel('$_channelName/event');
   static Map<int, StreamController<PingData>> controllers = {};

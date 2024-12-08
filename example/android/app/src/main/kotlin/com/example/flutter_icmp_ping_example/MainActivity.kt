@@ -1,4 +1,4 @@
-package com.example.flutter_icmp_ping_example
+package com.example.flutter_icmp_ping_platform_example
 
 import io.flutter.embedding.android.FlutterActivity
 

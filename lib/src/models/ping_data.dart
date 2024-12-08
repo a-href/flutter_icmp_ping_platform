@@ -1,6 +1,7 @@
-import 'package:flutter_icmp_ping/src/models/ping_error.dart';
-import 'package:flutter_icmp_ping/src/models/ping_response.dart';
-import 'package:flutter_icmp_ping/src/models/ping_summary.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_error.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_response.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_summary.dart';
+
 
 /// Ping response data
 class PingData {

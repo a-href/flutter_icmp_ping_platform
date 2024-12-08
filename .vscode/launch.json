@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "flutter_icmp_ping",
+            "name": "flutter_icmp_ping_platform",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "flutter_icmp_ping (profile mode)",
+            "name": "flutter_icmp_ping_platform (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "flutter_icmp_ping (release mode)",
+            "name": "flutter_icmp_ping_platform (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

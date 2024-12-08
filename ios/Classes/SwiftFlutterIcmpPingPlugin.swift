@@ -2,7 +2,7 @@ import Flutter
 import UIKit
 
 public class SwiftFlutterIcmpPingPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
-  private static let CHANNEL = "flutter_icmp_ping"
+  private static let CHANNEL = "flutter_icmp_ping_platform"
   private var pings: [Int:GBPingHelper] = [:]
 
   public static func register(with registrar: FlutterPluginRegistrar) {

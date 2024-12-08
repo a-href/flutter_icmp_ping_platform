@@ -1,8 +1,9 @@
-# flutter_icmp_ping
+# flutter_icmp_ping_platform
+
 
 Flutter plugin that sends ICMP ECHO_REQUEST.
 
-[![pub package](https://img.shields.io/pub/v/flutter_icmp_ping.svg)](https://pub.dartlang.org/packages/flutter_icmp_ping)
+Fork from [![pub package](https://img.shields.io/pub/v/flutter_icmp_ping.svg)](https://pub.dartlang.org/packages/flutter_icmp_ping)
 
 ## Supported platforms
 
@@ -11,17 +12,17 @@ Flutter plugin that sends ICMP ECHO_REQUEST.
 
 ## Getting Started
 
-To use this plugin, add `flutter_icmp_ping` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/).
+To use this plugin, add `flutter_icmp_ping_platform` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/).
 
 ```yaml
 dependencies:
-  flutter_icmp_ping:
+  flutter_icmp_ping_platform:
 ```
 
 Import the library in your file.
 
 ```dart
-import 'package:flutter_icmp_ping/flutter_icmp_ping.dart';
+import 'package:flutter_icmp_ping_platform/flutter_icmp_ping_platform.dart';
 ```
 
 See the `example` directory for a complete sample app using Ping.

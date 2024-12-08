@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter_icmp_ping/src/models/ping_data.dart';
+import 'package:flutter_icmp_ping_platform/src/models/ping_data.dart';
 
 abstract class BasePing {
   BasePing(

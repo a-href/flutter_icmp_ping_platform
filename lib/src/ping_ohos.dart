@@ -70,7 +70,6 @@ class PingOhos extends BasePing {
   /// StreamTransformer for Android response from process stdout/stderr.
   static final StreamTransformer<String, PingData> _androidTransformer = StreamTransformer.fromHandlers(
     handleData: (data, sink) {
-      print("ping data $data");
       if (data.contains('Host Unreachable')) {
         sink.add(
           PingData(
@@ -134,7 +133,7 @@ class PingOhos extends BasePing {
           final group1 = transmitted.group(1);
           final group2 = received.group(1);
           final group3 = time.group(1);
-          if (group2 == 1) {
+          if (group2 == '1') {
             sink.add(
               PingData(
                 error: PingError.unreachable,

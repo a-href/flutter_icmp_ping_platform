@@ -4,4 +4,5 @@ enum PingError {
   unreachable,
   unknownHost,
   unknown,
+  unreachable,
 }

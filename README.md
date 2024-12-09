@@ -9,6 +9,7 @@ Fork from [![pub package](https://img.shields.io/pub/v/flutter_icmp_ping.svg)](h
 
 - Flutter Android
 - Flutter iOS
+- Flutter OHOS
 
 ## Getting Started
 

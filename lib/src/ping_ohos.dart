@@ -10,12 +10,9 @@ import 'package:flutter_icmp_ping_platform/src/models/ping_response.dart';
 import 'package:flutter_icmp_ping_platform/src/models/ping_summary.dart';
 
 class PingOhos extends BasePing {
-  PingOhos(String host, int? count, double? interval, double? timeout,
-      bool? ipv6, int? ttl)
-      : super(host, count, interval, timeout, ipv6, ttl);
+  PingOhos(String host, int? count, double? interval, double? timeout, bool? ipv6, int? ttl) : super(host, count, interval, timeout, ipv6, ttl);
 
-  static final _resRegex =
-  RegExp(r'from (.*): icmp_seq=(\d+) ttl=(\d+) time=((\d+).?(\d+))');
+  static final _resRegex = RegExp(r'from (.*): icmp_seq=(\d+) ttl=(\d+) time=((\d+).?(\d+))');
   static final _seqRegex = RegExp(r'icmp_seq=(\d+)');
   static final _summaryRegexes = [
     RegExp(r'(\d+) packets transmitted'),
@@ -31,27 +28,27 @@ class PingOhos extends BasePing {
       throw Exception('ping is already running');
     }
     var params = [];
-    if (count != null){
+    if (count != null) {
       params.add('-c');
       params.add('$count');
     }
 
-    if (timeout != null){
+    if (timeout != null) {
       params.add('-w');
       params.add('${timeout?.toInt()}');
     }
 
-    if (interval != null){
+    if (interval != null) {
       params.add('-i');
       params.add('$interval');
     }
 
-    if (ttl != null){
+    if (ttl != null) {
       params.add('-t');
       params.add('$ttl');
     }
 
-    List<String> command = [(ipv6 ?? false) ? 'ping6' : 'ping',...params,host];
+    List<String> command = [(ipv6 ?? false) ? 'ping6' : 'ping', ...params, host];
     _process = await Process.start(command.first, command.skip(1).toList());
 
     if (_process == null) {
@@ -60,11 +57,7 @@ class PingOhos extends BasePing {
     _process?.exitCode.then((value) {
       controller.close();
     });
-    subscription = StreamGroup.merge([_process!.stderr, _process!.stdout])
-        .transform(utf8.decoder)
-        .transform(const LineSplitter())
-        .transform<PingData>(_androidTransformer)
-        .listen(controller.add);
+    subscription = StreamGroup.merge([_process!.stderr, _process!.stdout]).transform(utf8.decoder).transform(const LineSplitter()).transform<PingData>(_androidTransformer).listen(controller.add);
   }
 
   @override
@@ -74,40 +67,23 @@ class PingOhos extends BasePing {
   }
 
   /// StreamTransformer for Android response from process stdout/stderr.
-  static final StreamTransformer<String, PingData> _androidTransformer =
-  StreamTransformer.fromHandlers(
+  /// StreamTransformer for Android response from process stdout/stderr.
+  static final StreamTransformer<String, PingData> _androidTransformer = StreamTransformer.fromHandlers(
     handleData: (data, sink) {
-      print("lingjie data : $data");
-      if (data.contains('unknown host')) {
+      print("ping data $data");
+      if (data.contains('Host Unreachable')) {
+        sink.add(
+          PingData(
+            error: PingError.unreachable,
+          ),
+        );
+      } else if (data.contains('unknown host')) {
         sink.add(
           PingData(
             error: PingError.unknownHost,
           ),
         );
-      }
-      if (data.contains('bytes from')) {
-        final match = _resRegex.firstMatch(data);
-        if (match == null) {
-          return;
-        }
-        final seq = match.group(2);
-        final ttl = match.group(3);
-        final time = match.group(4);
-        sink.add(
-          PingData(
-            response: PingResponse(
-              ip: match.group(1),
-              seq: seq == null ? null : int.parse(seq) - 1,
-              ttl: ttl == null ? null : int.parse(ttl),
-              time: time == null
-                  ? null
-                  : Duration(
-                  microseconds: ((double.parse(time)) * 1000).floor()),
-            ),
-          ),
-        );
-      }
-      if (data.contains('no answer yet')) {
+      } else if (data.contains('no answer yet')) {
         final match = _seqRegex.firstMatch(data);
         if (match == null) {
           return;
@@ -121,50 +97,61 @@ class PingOhos extends BasePing {
             error: PingError.requestTimedOut,
           ),
         );
-      }
-      if (data.contains('packet loss')) {
-        final transmitted = _summaryRegexes[0].firstMatch(data);
-        final received = _summaryRegexes[1].firstMatch(data);
-        final time = _summaryRegexes[2].firstMatch(data);
-        if (transmitted == null || received == null || time == null) {
-          return;
-        }
-        final group1 = transmitted.group(1);
-        final group2 = received.group(1);
-        final group3 = time.group(1);
+      } else if (data.contains('Network is unreachable')) {
         sink.add(
           PingData(
-            summary: PingSummary(
-              transmitted: group1 == null ? null : int.parse(group1),
-              received: group2 == null ? null : int.parse(group2),
-              time: group3 == null
-                  ? null
-                  : Duration(milliseconds: int.parse(group3)),
-            ),
+            error: PingError.unreachable,
           ),
         );
-      }
-      if (data.contains('Network is unreachable')) {
-        final transmitted = _summaryRegexes[0].firstMatch(data);
-        final received = _summaryRegexes[1].firstMatch(data);
-        final time = _summaryRegexes[2].firstMatch(data);
-        if (transmitted == null || received == null || time == null) {
-          return;
+      } else {
+        if (data.contains('bytes from')) {
+          final match = _resRegex.firstMatch(data);
+          if (match == null) {
+            return;
+          }
+          final seq = match.group(2);
+          final ttl = match.group(3);
+          final time = match.group(4);
+          sink.add(
+            PingData(
+              response: PingResponse(
+                ip: match.group(1),
+                seq: seq == null ? null : int.parse(seq) - 1,
+                ttl: ttl == null ? null : int.parse(ttl),
+                time: time == null ? null : Duration(microseconds: ((double.parse(time)) * 1000).floor()),
+              ),
+            ),
+          );
         }
-        final group1 = transmitted.group(1);
-        final group2 = received.group(1);
-        final group3 = time.group(1);
-        sink.add(
-          PingData(
-            summary: PingSummary(
-              transmitted: group1 == null ? null : int.parse(group1),
-              received: group2 == null ? null : int.parse(group2),
-              time: group3 == null
-                  ? null
-                  : Duration(milliseconds: int.parse(group3)),
-            ),
-          ),
-        );
+
+        if (data.contains('packet loss')) {
+          final transmitted = _summaryRegexes[0].firstMatch(data);
+          final received = _summaryRegexes[1].firstMatch(data);
+          final time = _summaryRegexes[2].firstMatch(data);
+          if (transmitted == null || received == null || time == null) {
+            return;
+          }
+          final group1 = transmitted.group(1);
+          final group2 = received.group(1);
+          final group3 = time.group(1);
+          if (group2 == 1) {
+            sink.add(
+              PingData(
+                error: PingError.unreachable,
+              ),
+            );
+          } else {
+            sink.add(
+              PingData(
+                summary: PingSummary(
+                  transmitted: group1 == null ? null : int.parse(group1),
+                  received: group2 == null ? null : int.parse(group2),
+                  time: group3 == null ? null : Duration(milliseconds: int.parse(group3)),
+                ),
+              ),
+            );
+          }
+        }
       }
     },
   );

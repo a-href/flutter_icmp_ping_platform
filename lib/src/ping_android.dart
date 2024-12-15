@@ -114,23 +114,15 @@ class PingAndroid extends BasePing {
           final group1 = transmitted.group(1);
           final group2 = received.group(1);
           final group3 = time.group(1);
-          if (group2 == '1') {
-            sink.add(
-              PingData(
-                error: PingError.unreachable,
+          sink.add(
+            PingData(
+              summary: PingSummary(
+                transmitted: group1 == null ? null : int.parse(group1),
+                received: group2 == null ? null : int.parse(group2),
+                time: group3 == null ? null : Duration(milliseconds: int.parse(group3)),
               ),
-            );
-          } else {
-            sink.add(
-              PingData(
-                summary: PingSummary(
-                  transmitted: group1 == null ? null : int.parse(group1),
-                  received: group2 == null ? null : int.parse(group2),
-                  time: group3 == null ? null : Duration(milliseconds: int.parse(group3)),
-                ),
-              ),
-            );
-          }
+            ),
+          );
         }
       }
     },
